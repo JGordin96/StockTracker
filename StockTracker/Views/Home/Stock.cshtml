@@ -37,7 +37,7 @@
         var ticker = $("#stockInput").val();
         var lastDay = "";
 
-        $.ajax({
+        $.ajax({ 
             type: "GET",
             url: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&apikey=" + key + "",
             dataType: "json",
