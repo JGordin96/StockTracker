@@ -38,6 +38,34 @@
         
     }
 
+    function getDataForGivenDays(tempdataArray, numberOfDays) {
+        var counter = 0;
+        stockdataArray = []
+        $.each(tempdataArray, function (index, day) {
+
+            counter++;
+            if (counter < numberOfDays) {
+                stockdataArray.push(day);
+
+            }
+
+        });
+        return stockdataArray;
+    }
+
+    function getDatesForGivenDays(tempdataArray, numberOfDays) {
+        var counter = 0;
+        stockdateArray = []
+        $.each(tempdataArray, function (index, day) {
+
+            counter++;
+            if (counter < numberOfDays) {
+                stockdateArray.push(index);
+            }
+           
+        });
+        return stockdataArray;
+    }
 
 
     const key = 'JEZZ18QI4141C78H';
@@ -61,32 +89,24 @@
                 var metadata = []
                 var tempdata = []
                 var stockdata = []
-                var dates =[]
+                var dates = []
                 $.each(result, function (index, day) {
                     metadata.push(day);
                 });
+
                 tempdata = metadata[1]
                 
-                var counter = 0
+                stockdata = getDataForGivenDays(tempdata, 7);
 
-                //TODO break into seperate method and add number of days as param
-                $.each(tempdata, function (index, day) {
-                    
-                    counter++;
-                    if (counter < 7) {
-                        dates.push(index);
-                        stockdata.push(day);
-                        
-                    }
-                    
-                });
 
-                
+                dates = getDatesForGivenDays(tempdata, 7);
+
+
                 var results = ""
 
                 ticker = metadata[0]["2. Symbol"].toUpperCase();
                
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 6; i++) {
                     var openHtml = compareClose(stockdata[i]["1. open"], stockdata[i + 1]["1. open"]);
                     var highHtml = compareClose(stockdata[i]["2. high"], stockdata[i + 1]["2. high"]);
                     var closingHtml = compareClose(stockdata[i]["4. close"], stockdata[i + 1]["4. close"]);
