@@ -25,9 +25,18 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
 
-    //function compareData(testdaysArray) {
-    //    if()
-    //}
+    //TODO refactor duhhh and rename
+    function compareClose(dayOne, dayTwo) {
+        var closingData = "";
+        if (dayOne > dayTwo) {
+            
+            return '<td id="close" class="data higher">' + dayOne + '</td>';
+        }
+        else {
+            return '<td id="close" class="data lower">' + dayOne + '</td>';
+        }
+        
+    }
 
 
 
@@ -49,43 +58,57 @@
             url: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&apikey=" + key + "",
             dataType: "json",
             success: function (result) {
-                var days = []
-                var realdays = []
-                var testdays = []
+                var metadata = []
+                var tempdata = []
+                var stockdata = []
                 var dates =[]
                 $.each(result, function (index, day) {
-                    days.push(day);
+                    metadata.push(day);
                 });
-                realdays = days[1]
+                tempdata = metadata[1]
                 
+                var counter = 0
 
-                $.each(realdays, function (index, day) {
-                    var counter = 0
-                    dates.push(index);
-                    testdays.push(day);
-    
+                //TODO break into seperate method and add number of days as param
+                $.each(tempdata, function (index, day) {
+                    
+                    counter++;
+                    if (counter < 7) {
+                        dates.push(index);
+                        stockdata.push(day);
+                        
+                    }
+                    
                 });
 
-                console.log(testdays);
+                
                 var results = ""
 
+                ticker = metadata[0]["2. Symbol"].toUpperCase();
                
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < 5; i++) {
+                    var openHtml = compareClose(stockdata[i]["1. open"], stockdata[i + 1]["1. open"]);
+                    var highHtml = compareClose(stockdata[i]["2. high"], stockdata[i + 1]["2. high"]);
+                    var closingHtml = compareClose(stockdata[i]["4. close"], stockdata[i + 1]["4. close"]);
+                    var lowHtml = compareClose(stockdata[i]["3. low"], stockdata[i + 1]["3. low"]);
+                    var volumeHtml = compareClose(stockdata[i]["5. volume"], stockdata[i + 1]["5. volume"]);
                     var results = ""
-                    results +=
+                    results += 
                         '<tr >' +
-            '<td id="ticker" class="data">' + days[0]["2. Symbol"] + '</td>' +
-            '<td id="date" class="data">' + dates[i] + '</td>' +
-            '<td id="open" class="data">' + testdays[i]["1. open"] + '</td>' +
-            '<td id="high" class="data">' + testdays[i]["2. high"] + '</td>' +
-            '<td id="low" class="data">' + testdays[i]["3. low"] + '</td>' +
-            '<td id="close" class="data">' + testdays[i]["4. close"] + '</td>' +
-            '<td id="volume" class="data">' + testdays[i]["5. volume"] + '</td>' +
+                    '<td id="ticker" class="data ticker">' + ticker + '</td>' +
+                    '<td id="date" class="data date">' + dates[i] + '</td>' +
+                        openHtml + 
+                        highHtml +
+                        lowHtml +
+                        closingHtml +
+                        volumeHtml +
                         '</tr>';
                     
                     $('#results').append(results);
                     
                 }
+
+                
 
             },
         });
@@ -96,4 +119,18 @@
 
 
 </script>
+<style>
+    .higher{
+        background-color: green;
+    }
+    .lower {
+        background-color: red;
+    }
+    .ticker{
+        background-color: lightgoldenrodyellow;
+    }
+    .date {
+        background-color: lightgoldenrodyellow;
+    }
+</style>
 
