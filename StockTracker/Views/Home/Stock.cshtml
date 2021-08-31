@@ -17,6 +17,9 @@
     </div>
     <input type="submit" value="Submit" /><br /><br />
 </form>
+<div id="error">
+
+</div>
 
 <table class="table table-bordered table-responsive table-hover" id="results">
     <tr>
@@ -84,61 +87,74 @@
         var url = form.attr('action');
         var ticker = $("#stockInput").val();
         $('.data').remove();
+        $('.error').remove();
         
         var tradingDays = parseInt($('#dayInput').val(), 10);
+        if (Number.isNaN(tradingDays)) {
+            var dayError = '<p class="error">Please enter a valid number 1-99</p>';
+            $('#error').append(dayError);
+        }
         tradingDays += 1;
+
         
-        //todo get error to work if invalid ticker
         $.ajax({ 
             type: "GET",
             url: "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&apikey=" + key + "",
             dataType: "json",
             success: function (result) {
-                var metadata = []
-                var tempdata = []
-                var stockdata = []
-                var dates = []
-                $.each(result, function (index, day) {
-                    metadata.push(day);
-                });
 
-                tempdata = metadata[1]
-                
-                stockdata = getDataForGivenDays(tempdata, tradingDays);
+                if (result["Error Message"] != undefined) {
+                    var tickerError = '<p class="error">Invalid ticker, please try again</p>';
+                    $('#error').append(tickerError);
+                }
+                else {
+                    var metadata = []
+                    var tempdata = []
+                    var stockdata = []
+                    var dates = []
+                    $.each(result, function (index, day) {
+                        metadata.push(day);
+                    });
 
-                dates = getDatesForGivenDays(tempdata, tradingDays);
-            
+                    tempdata = metadata[1]
+
+                    stockdata = getDataForGivenDays(tempdata, tradingDays);
+
+                    dates = getDatesForGivenDays(tempdata, tradingDays);
 
 
-                var results = ""
 
-                ticker = metadata[0]["2. Symbol"].toUpperCase();
-               
-                for (let i = 0; i < tradingDays-1; i++) {
-                    var openHtml = compareData(stockdata[i]["1. open"], stockdata[i + 1]["1. open"]);
-                    var highHtml = compareData(stockdata[i]["2. high"], stockdata[i + 1]["2. high"]);
-                    var closingHtml = compareData(stockdata[i]["4. close"], stockdata[i + 1]["4. close"]);
-                    var lowHtml = compareData(stockdata[i]["3. low"], stockdata[i + 1]["3. low"]);
-                    var volumeHtml = compareData(stockdata[i]["5. volume"], stockdata[i + 1]["5. volume"]);
                     var results = ""
-                    results += 
-                        '<tr >' +
-                    '<td id="ticker" class="data ticker">' + ticker + '</td>' +
-                    '<td id="date" class="data date">' + dates[i] + '</td>' +
-                        openHtml + 
-                        highHtml +
-                        lowHtml +
-                        closingHtml +
-                        volumeHtml +
-                        '</tr>';
-                    
-                    $('#results').append(results);
-                    
+
+                    ticker = metadata[0]["2. Symbol"].toUpperCase();
+
+                    for (let i = 0; i < tradingDays - 1; i++) {
+                        var openHtml = compareData(stockdata[i]["1. open"], stockdata[i + 1]["1. open"]);
+                        var highHtml = compareData(stockdata[i]["2. high"], stockdata[i + 1]["2. high"]);
+                        var closingHtml = compareData(stockdata[i]["4. close"], stockdata[i + 1]["4. close"]);
+                        var lowHtml = compareData(stockdata[i]["3. low"], stockdata[i + 1]["3. low"]);
+                        var volumeHtml = compareData(stockdata[i]["5. volume"], stockdata[i + 1]["5. volume"]);
+                        var results = ""
+                        results +=
+                            '<tr >' +
+                            '<td id="ticker" class="data ticker">' + ticker + '</td>' +
+                            '<td id="date" class="data date">' + dates[i] + '</td>' +
+                            openHtml +
+                            highHtml +
+                            lowHtml +
+                            closingHtml +
+                            volumeHtml +
+                            '</tr>';
+
+                        $('#results').append(results);
+
+                    }
+
+
+
+                }
                 }
 
-                
-
-            },
         });
 
         $("#stockInput").val('');
@@ -160,6 +176,9 @@
     }
     .date {
         background-color: lightgoldenrodyellow;
+    }
+    .error{
+        color: red;
     }
 </style>
 
