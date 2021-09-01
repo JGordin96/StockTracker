@@ -20,10 +20,13 @@
 <div id="error">
 
 </div>
+<div id="headerDiv">
+
+</div>
 
 <table class="table table-bordered table-responsive table-hover" id="results">
-    <tr>
-        <th>Ticker</th>
+    <tr id"tableHeaders">
+        @*<th>Ticker</th>*@
         <th>Date</th>
         <th>Open</th>
         <th>High</th>
@@ -88,13 +91,14 @@
         var ticker = $("#stockInput").val();
         $('.data').remove();
         $('.error').remove();
+        $('.header').remove();
         
         var tradingDays = parseInt($('#dayInput').val(), 10);
         if (Number.isNaN(tradingDays)) {
             var dayError = '<p class="error">Please enter a valid number 1-99</p>';
             $('#error').append(dayError);
         }
-        tradingDays += 1;
+        comparedDays = tradingDays + 1;
 
         
         $.ajax({ 
@@ -118,17 +122,20 @@
 
                     tempdata = metadata[1]
 
-                    stockdata = getDataForGivenDays(tempdata, tradingDays);
+                    stockdata = getDataForGivenDays(tempdata, comparedDays);
 
-                    dates = getDatesForGivenDays(tempdata, tradingDays);
+                    dates = getDatesForGivenDays(tempdata, comparedDays);
 
 
 
                     var results = ""
 
                     ticker = metadata[0]["2. Symbol"].toUpperCase();
+                    console.log(metadata[0]);
+                    var header = '<h3 class="header">Trading hisory for ticker $' + ticker + ' for last ' + tradingDays + ' trading days</h3>';
+                    $('#headerDiv').append(header);
 
-                    for (let i = 0; i < tradingDays - 1; i++) {
+                    for (let i = 0; i < tradingDays; i++) {
                         var openHtml = compareData(stockdata[i]["1. open"], stockdata[i + 1]["1. open"]);
                         var highHtml = compareData(stockdata[i]["2. high"], stockdata[i + 1]["2. high"]);
                         var closingHtml = compareData(stockdata[i]["4. close"], stockdata[i + 1]["4. close"]);
@@ -137,7 +144,6 @@
                         var results = ""
                         results +=
                             '<tr >' +
-                            '<td id="ticker" class="data ticker">' + ticker + '</td>' +
                             '<td id="date" class="data date">' + dates[i] + '</td>' +
                             openHtml +
                             highHtml +
@@ -159,7 +165,6 @@
 
         $("#stockInput").val('');
         $("#dayInput").val('');
-
     });
 
 
