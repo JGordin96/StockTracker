@@ -26,7 +26,6 @@
 
 <table class="table table-bordered table-responsive table-hover" id="results">
     <tr id"tableHeaders">
-        @*<th>Ticker</th>*@
         <th>Date</th>
         <th>Open</th>
         <th>High</th>
@@ -35,6 +34,9 @@
         <th>Volume</th>
     </tr>
 </table>
+<div id="newsDiv">
+
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
 
@@ -49,6 +51,33 @@
         }
         
     }
+
+    function getNews(ticker) {
+        var newsArray = []
+        $.ajax({
+            type: "GET",
+            url: "https://newsapi.org/v2/everything?q=" + ticker + "&from=2021-09-01&sortBy=popularity&apiKey=" + newsKey,
+            dataType: "json",
+            success: function (result) {
+                $.each(result.articles, function (index, article) {
+                    var article = 
+                        '<div class="news">' +
+                        '<h2>' + article.title + '</h2>' +
+                        '<h4>' + article.description + '</h4>' +
+                        '<a href=' + article.url+' target="_blank">'+
+                        '<img width = "220" height = "250" border = "0" align = "center"  src="' + article.urlToImage+'"/>'+
+                        '</a >' +
+                        '</div > ';
+
+                    newsArray.push(article);
+                    urlLOL = "";
+                });
+                $('#newsDiv').append(newsArray);
+            }
+        });
+      
+    }
+
 
     function getDataForGivenDays(tempdataArray, numberOfDays) {
         var counter = 0;
@@ -81,6 +110,7 @@
 
 
     const key = 'JEZZ18QI4141C78H';
+    const newsKey = 'c585ddfc872544cda90d70bd3fafa96f';
 
     $("#stockForm").submit(function (e) {
 
@@ -92,6 +122,7 @@
         $('.data').remove();
         $('.error').remove();
         $('.header').remove();
+        $('.news').remove();
         
         var tradingDays = parseInt($('#dayInput').val(), 10);
         if (Number.isNaN(tradingDays)) {
@@ -131,7 +162,6 @@
                     var results = ""
 
                     ticker = metadata[0]["2. Symbol"].toUpperCase();
-                    console.log(metadata[0]);
                     var header = '<h3 class="header">Trading hisory for ticker $' + ticker + ' for last ' + tradingDays + ' trading days</h3>';
                     $('#headerDiv').append(header);
 
@@ -165,6 +195,9 @@
 
         $("#stockInput").val('');
         $("#dayInput").val('');
+
+        var articleArray = getNews(ticker);
+        
     });
 
 
