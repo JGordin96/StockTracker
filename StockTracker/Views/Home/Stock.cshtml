@@ -5,7 +5,7 @@
 
 <h2>Stock Info</h2>
 
-@*TODO look into bootstrap form*@
+
 <form id="stockForm">
     <div class="form-group">
         <label for="stockInput">Input a Ticker</label>
@@ -56,7 +56,7 @@
         var newsArray = []
         $.ajax({
             type: "GET",
-            url: "https://newsapi.org/v2/everything?q=$" + ticker + "&from=2021-09-01&sortBy=popularity&apiKey=" + newsKey,
+            url: 'https://newsapi.org/v2/everything?q=$"' + ticker + '"&language=en&sortBy=relevancy&pageSize=5&apiKey=' + newsKey,
             dataType: "json",
             success: function (result) {
                 $.each(result.articles, function (index, article) {
@@ -184,7 +184,7 @@
                         $('#results').append(results);
 
                     }
-
+                     var articleArray = getNews(ticker);
 
 
                 }
@@ -195,7 +195,7 @@
         $("#stockInput").val('');
         $("#dayInput").val('');
 
-        var articleArray = getNews(ticker);
+       
         
     });
 
